@@ -119,43 +119,4 @@
         );
       };
 
-      const App = () => {
-        const CAT1 = "https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react";
-        const CAT2 = "https://cataas.com/cat/BxqL2EjFmtxDkAm2/says/inflearn";
-        const CAT3 = "https://cataas.com/cat/18MD6byVC1yKGpXp/says/JavaScript";
-        const [counter, setCounter] = React.useState(
-          jsonLocalStorage.getItem("counter")
-        );
-        const [mainCat, setMainCat] = React.useState(CAT2);
-        const [favorites, setFavorites] = React.useState(
-          jsonLocalStorage.getItem("favorites") || []
-        );
-
-        function updateMainCat(e) {
-          setMainCat(CAT3);
-          const nextCounter = counter + 1;
-          setCounter(nextCounter);
-          jsonLocalStorage.setItem("counter", nextCounter);
-        }
-
-        function handleHeartClick() {
-          const nextFavorites = [...favorites, mainCat];
-          setFavorites(nextFavorites);
-          jsonLocalStorage.setItem("favorites", nextFavorites);
-        }
-        return (
-          <div>
-            <Title>{counter}번째 고양이 가라사대</Title>
-            <Form updateMainCat={updateMainCat} />
-            <Favorites favorites={favorites} />
-            <MainCard img={mainCat} onHeartClick={handleHeartClick} />
-          </div>
-        );
-      };
-
-      const 여기다가그려 = document.querySelector("#app");
-
-      ReactDOM.render(<App />, 여기다가그려);
-    </script>
-  </body>
-</html>
+      const App 
