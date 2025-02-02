@@ -22,18 +22,15 @@
       flex-wrap: wrap;
       gap: 15px;
     }
-    .favorites img {
-      width: 150px;
-    }
   </style>
   <body>
     <div id="app"></div>
     <script
-      src="https://unpkg.com/react@18/umd/react.production.min.js"
+      src="https://unpkg.com/react@18/umd/react.development.js"
       crossorigin
     ></script>
     <script
-      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
       crossorigin
     ></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -48,6 +45,15 @@
         },
       };
 
+      const fetchCat = async (text) => {
+        const OPEN_API_DOMAIN = "https://cataas.com";
+        const response = await fetch(
+          `${OPEN_API_DOMAIN}/cat/says/${text}?json=true`
+        );
+        const responseJson = await response.json();
+        return `${OPEN_API_DOMAIN}/cat/${responseJson._id}/says/${text}`; // NOTE: API 스펙 변경으로 강의 영상과 다른 URL로 변경했습니다.
+      };
+
       const Title = (props) => {
         return <h1>{props.children}</h1>;
       };
@@ -57,34 +63,32 @@
         const [value, setValue] = React.useState("");
         const [errorMessage, setErrorMessage] = React.useState("");
 
-        function handleInputChange(e) {
+        function handleInputChage(e) {
           const userValue = e.target.value;
+
+          setValue(userValue.toUpperCase());
           setErrorMessage("");
           if (includesHangul(userValue)) {
-            // alert("한글은 입력할 수 없습니다.");
             setErrorMessage("한글은 입력할수 없습니다.");
-            e.target.value = "";
           }
-          setValue(userValue.toUpperCase());
         }
 
-        function handleOnSubmit(e) {
-          updateMainCat();
+        function handleFormSubmit(e) {
           e.preventDefault();
           setErrorMessage("");
-
           if (value === "") {
-            setErrorMessage("빈값은 입력할수 없습니다.");
+            setErrorMessage("빈값으로 만들수 없습니다.");
             return;
           }
+          updateMainCat(value);
         }
         return (
-          <form onSubmit={handleOnSubmit}>
+          <form onSubmit={handleFormSubmit}>
             <input
               type="text"
               name="name"
               placeholder="영어 대사를 입력해주세요"
-              onChange={handleInputChange}
+              onChange={handleInputChage}
               value={value}
             />
             <button type="submit">생성</button>
@@ -100,6 +104,7 @@
           </li>
         );
       }
+
       function Favorites({ favorites }) {
         return (
           <ul className="favorites">
@@ -126,36 +131,23 @@
         const [counter, setCounter] = React.useState(
           jsonLocalStorage.getItem("counter")
         );
-        const [mainCat, setMainCat] = React.useState(CAT2);
+        const [mainCat, setMainCat] = React.useState(CAT1);
         const [favorites, setFavorites] = React.useState(
           jsonLocalStorage.getItem("favorites") || []
         );
 
-        function updateMainCat(e) {
-          setMainCat(CAT3);
+        async function setInitialCat() {
+          const newCat = await fetchCat("first cat");
+          setMainCat(newCat);
+        }
+
+        React.useEffect(() => {
+          setInitialCat();
+        }, []);
+
+        async function updateMainCat(value) {
+          const newCat = await fetchCat(value);
           const nextCounter = counter + 1;
+          setMainCat(newCat);
           setCounter(nextCounter);
-          jsonLocalStorage.setItem("counter", nextCounter);
-        }
-
-        function handleHeartClick() {
-          const nextFavorites = [...favorites, mainCat];
-          setFavorites(nextFavorites);
-          jsonLocalStorage.setItem("favorites", nextFavorites);
-        }
-        return (
-          <div>
-            <Title>{counter}번째 고양이 가라사대</Title>
-            <Form updateMainCat={updateMainCat} />
-            <Favorites favorites={favorites} />
-            <MainCard img={mainCat} onHeartClick={handleHeartClick} />
-          </div>
-        );
-      };
-
-      const 여기다가그려 = document.querySelector("#app");
-
-      ReactDOM.render(<App />, 여기다가그려);
-    </script>
-  </body>
-</html>
+          jsonLocalStorage.setItem("
