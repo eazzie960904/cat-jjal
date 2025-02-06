@@ -22,9 +22,9 @@
       flex-wrap: wrap;
       gap: 15px;
     }
-    .favorites img {
+    /* .favorites img {
       width: 150px;
-    }
+    } */
   </style>
   <body>
     <div id="app"></div>
@@ -38,6 +38,14 @@
     ></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script type="text/babel">
+      const jsonLocalStorage = {
+        setItem: (key, value) => {
+          localStorage.setItem(key, JSON.stringify(value));
+        },
+        getItem: (key) => {
+          return JSON.parse(localStorage.getItem(key));
+        },
+      };
       console.log("야옹");
 
       const Title = (props) => {
@@ -51,19 +59,18 @@
 
         function handleInputChange(e) {
           const userValue = e.target.value;
+          setValue(userValue.toUpperCase());
           setErrorMessage("");
           if (includesHangul(userValue)) {
             setErrorMessage("한글은 입력할수 없습니다.");
           }
-          setValue(userValue.toUpperCase());
         }
 
         function handleFormSubmit(e) {
           e.preventDefault();
           setErrorMessage("");
-
           if (value === "") {
-            setErrorMessage("빈값으로 만들 수 없습니다.");
+            setErrorMessage("빈값으로 만들수 없습니다.");
             return;
           }
           updateMainCat();
@@ -75,8 +82,8 @@
               type="text"
               name="name"
               placeholder="영어 대사를 입력해주세요"
-              onChange={handleInputChange}
               value={value}
+              onChange={handleInputChange}
             />
             <button type="submit">생성</button>
             <p style={{ color: "red" }}>{errorMessage}</p>
@@ -84,20 +91,11 @@
         );
       };
 
-      function CatItem({ img }) {
+      function CatItem(props) {
         return (
           <li>
-            <img src={img} style={{ width: "150px" }} />
+            <img src={props.img} style={{ width: "150px" }} />
           </li>
-        );
-      }
-
-      function MainCard({ img, onHeartClick }) {
-        return (
-          <div className="main-card">
-            <img src={img} alt="고양이" width="400" />
-            <button onClick={onHeartClick}>🤍</button>
-          </div>
         );
       }
 
@@ -111,34 +109,50 @@
         );
       }
 
+      const MainCard = ({ img, onHeartClick }) => {
+        return (
+          <div className="main-card">
+            <img src={img} alt="고양이" width="400" />
+            <button onClick={onHeartClick}>🤍</button>
+          </div>
+        );
+      };
+
       const App = () => {
         const CAT1 = "https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react";
         const CAT2 = "https://cataas.com/cat/BxqL2EjFmtxDkAm2/says/inflearn";
         const CAT3 = "https://cataas.com/cat/18MD6byVC1yKGpXp/says/JavaScript";
-        const [counter, setcounter] = React.useState(1);
-        const [mainCat, setMainCat] = React.useState(CAT1);
-        const [favorites, setFavorites] = React.useState([CAT1, CAT2]);
+        const [counter, setCounter] = React.useState(
+          jsonLocalStorage.getItem("counter")
+        );
+        const [mainCat, setMainCat] = React.useState(CAT2);
+        const [favorites, setFavorites] = React.useState(
+          jsonLocalStorage.getItem("favorites") || []
+        );
 
         function updateMainCat() {
-          setMainCat(CAT2);
-          setcounter(counter + 1);
+          setMainCat(CAT3);
+          const nextCounter = counter + 1;
+          setCounter(nextCounter);
+          jsonLocalStorage.setItem("counter", nextCounter);
         }
 
-        function onHeartClick() {
-          setFavorites([...favorites, CAT3]);
+        function handleHeartClick() {
+          const nextFavorites = [...favorites, CAT3];
+          setFavorites(nextFavorites);
+          jsonLocalStorage.setItem("favorites", nextFavorites);
         }
         return (
           <div>
             <Title>{counter}번째 고양이 가라사대</Title>
             <Form updateMainCat={updateMainCat} />
-            <MainCard img={mainCat} onHeartClick={onHeartClick} />
+            <MainCard img={mainCat} onHeartClick={handleHeartClick} />
             <Favorites favorites={favorites} />
           </div>
         );
       };
 
       const 여기다가그려 = document.querySelector("#app");
-
       ReactDOM.render(<App />, 여기다가그려);
     </script>
   </body>
