@@ -39,6 +39,7 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script type="text/babel">
       console.log("야옹");
+
       const jsonLocalStorage = {
         setItem: (key, value) => {
           localStorage.setItem(key, JSON.stringify(value));
@@ -46,6 +47,15 @@
         getItem: (key) => {
           return JSON.parse(localStorage.getItem(key));
         },
+      };
+
+      const fetchCat = async (text) => {
+        const OPEN_API_DOMAIN = "https://cataas.com";
+        const response = await fetch(
+          `${OPEN_API_DOMAIN}/cat/says/${text}?json=true`
+        );
+        const responseJson = await response.json();
+        return `${OPEN_API_DOMAIN}/cat/${responseJson._id}/says/${text}`; // NOTE: API 스펙 변경으로 강의 영상과 다른 URL로 변경했습니다.
       };
 
       const Title = (props) => {
@@ -59,25 +69,24 @@
 
         function handleInputChange(e) {
           const userValue = e.target.value;
+          setValue(userValue.toUpperCase());
           setErrorMessage("");
           if (includesHangul(userValue)) {
-            // alert("한글은 입력할 수 없습니다.");
             setErrorMessage("한글은 입력할수 없습니다.");
-            e.target.value = "";
           }
-          setValue(userValue.toUpperCase());
         }
 
         function handleOnSubmit(e) {
-          updateMainCat();
           e.preventDefault();
           setErrorMessage("");
 
           if (value === "") {
-            setErrorMessage("빈값은 입력할수 없습니다.");
+            setErrorMessage("빈값으로 만들수 없습니다.");
             return;
           }
+          updateMainCat(value);
         }
+
         return (
           <form onSubmit={handleOnSubmit}>
             <input
@@ -123,7 +132,7 @@
         const CAT1 = "https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react";
         const CAT2 = "https://cataas.com/cat/BxqL2EjFmtxDkAm2/says/inflearn";
         const CAT3 = "https://cataas.com/cat/18MD6byVC1yKGpXp/says/JavaScript";
-        const [counter, setCounter] = React.useState(
+        const [count, setCount] = React.useState(
           jsonLocalStorage.getItem("counter")
         );
         const [mainCat, setMainCat] = React.useState(CAT2);
@@ -131,11 +140,25 @@
           jsonLocalStorage.getItem("favorites") || []
         );
 
-        function updateMainCat(e) {
-          setMainCat(CAT3);
-          const nextCounter = counter + 1;
-          setCounter(nextCounter);
-          jsonLocalStorage.setItem("counter", nextCounter);
+        async function setInitialCat() {
+          const newCat = await fetchCat("first Cat");
+          setMainCat(newCat);
+        }
+
+        React.useEffect(() => {
+          setInitialCat();
+        }, []);
+
+        React.useEffect(() => {
+          console.log("hellow");
+        }, [count]);
+
+        async function updateMainCat(value) {
+          const newCat = await fetchCat(value);
+          setMainCat(newCat);
+          const nextCount = count + 1;
+          setCount(nextCount);
+          jsonLocalStorage.setItem("counter", nextCount);
         }
 
         function handleHeartClick() {
@@ -145,10 +168,10 @@
         }
         return (
           <div>
-            <Title>{counter}번째 고양이 가라사대</Title>
+            <Title>{count}번째 고양이 가라사대</Title>
             <Form updateMainCat={updateMainCat} />
-            <Favorites favorites={favorites} />
             <MainCard img={mainCat} onHeartClick={handleHeartClick} />
+            <Favorites favorites={favorites} />
           </div>
         );
       };

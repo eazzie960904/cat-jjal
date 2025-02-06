@@ -138,6 +138,15 @@
           jsonLocalStorage.getItem("favorites") || []
         );
 
+        async function setInitialCat() {
+          const newCat = await fetchCat("firstCat");
+          setMainCat(newCat);
+        }
+
+        React.useEffect(() => {
+          setInitialCat();
+        }, []);
+
         async function updateMainCat(value) {
           const newCat = await fetchCat(value);
 
@@ -150,4 +159,22 @@
         function handleHeartClick() {
           const nextFavorites = [...favorites, mainCat];
           setFavorites(nextFavorites);
-          jsonLocalStorage.setItem("favori
+          jsonLocalStorage.setItem("favorites", nextFavorites);
+        }
+
+        return (
+          <div>
+            <Title>{counter}번째 고양이 가라사대</Title>
+            <Form updateMainCat={updateMainCat} />
+            <MainCard img={mainCat} onHeartClick={handleHeartClick} />
+            <Favorites favorites={favorites} />
+          </div>
+        );
+      };
+
+      const 여기다가그려 = document.querySelector("#app");
+
+      ReactDOM.render(<App />, 여기다가그려);
+    </script>
+  </body>
+</html>
