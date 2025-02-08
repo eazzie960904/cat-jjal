@@ -151,42 +151,4 @@
           setMainCat(newCat);
         }
 
-        React.useEffect(() => {
-          setInitialCat();
-        }, []);
-
-        async function updateMainCat(value) {
-          const newCat = await fetchCat(value);
-
-          setMainCat(newCat);
-          const nextCounter = counter + 1;
-          setCounter(nextCounter);
-          jsonLocalStorage.setItem("counter", nextCounter);
-        }
-
-        function handleHeartClick() {
-          const nextFavorites = [...favorites, mainCat];
-          setFavorites(nextFavorites);
-          jsonLocalStorage.setItem("favorites", nextFavorites);
-        }
-
-        const counterTitle = counter === null ? "" : counter + "번째 ";
-        return (
-          <div>
-            <Title>{counterTitle}고양이 가라사대</Title>
-            <Form updateMainCat={updateMainCat} />
-            <MainCard
-              img={mainCat}
-              onHeartClick={handleHeartClick}
-              alreadyFavorite={alreadyFavorite}
-            />
-            <Favorites favorites={favorites} />
-          </div>
-        );
-      };
-
-      const 여기다가그려 = document.querySelector("#app");
-      ReactDOM.render(<App />, 여기다가그려);
-    </script>
-  </body>
-</html>
+        React.useEffect

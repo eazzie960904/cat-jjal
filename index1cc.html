@@ -110,7 +110,7 @@
 
       function Favorites({ favorites }) {
         if (favorites.length === 0) {
-          return <div>사진위 하트를 눌러 고양이 사진을 저장해봐요</div>;
+          return <div>사진위 하트를 눌러 고양이를 저장해봐요</div>;
         }
         return (
           <ul className="favorites">
@@ -126,7 +126,7 @@
         return (
           <div className="main-card">
             <img src={img} alt="고양이" width="400" />
-            <button onClick={onHeartClick}>🤍</button>
+            <button onClick={onHeartClick}>{heartIcon}</button>
           </div>
         );
       };
@@ -135,6 +135,7 @@
         const CAT1 = "https://cataas.com/cat/HSENVDU4ZMqy7KQ0/says/react";
         const CAT2 = "https://cataas.com/cat/BxqL2EjFmtxDkAm2/says/inflearn";
         const CAT3 = "https://cataas.com/cat/18MD6byVC1yKGpXp/says/JavaScript";
+
         const [counter, setCounter] = React.useState(
           jsonLocalStorage.getItem("counter")
         );
@@ -145,18 +146,17 @@
 
         const alreadyFavorites = favorites.includes(mainCat);
 
-        async function setInitialCat() {
+        async function setinitialCat() {
           const newCat = await fetchCat("firstCat");
           setMainCat(newCat);
         }
 
         React.useEffect(() => {
-          setInitialCat();
+          setinitialCat();
         }, []);
 
         async function updateMainCat(value) {
           const newCat = await fetchCat(value);
-
           setMainCat(newCat);
           const nextCounter = counter + 1;
           setCounter(nextCounter);
@@ -168,9 +168,11 @@
           setFavorites(nextFavorites);
           jsonLocalStorage.setItem("favorites", nextFavorites);
         }
+
+        const counterTitle = counter === null ? "" : counter + "번째 ";
         return (
           <div>
-            <Title>{counter}번째 고양이 가라사대</Title>
+            <Title>{counterTitle}고양이 가라사대</Title>
             <Form updateMainCat={updateMainCat} />
             <MainCard
               img={mainCat}
